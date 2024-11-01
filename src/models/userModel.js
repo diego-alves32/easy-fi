@@ -1,7 +1,7 @@
 const db = require("../db/knex");
 
 const createUser = async (usuario) => {
-  try { // Diego, aqui vc tem que colocar uma validação de e-mail já cadastrado.
+  try {
     await db("usuarios").insert({
       email: usuario.email,
       nome: usuario.nome,
@@ -13,7 +13,7 @@ const createUser = async (usuario) => {
   }
 };
 
-const getUser = async (email) => {
+const getUserByEmail = async (email) => {
   try {
     const usuario = await db("usuarios")
       .select("*")
@@ -64,7 +64,7 @@ const updateUser = async (id, userData) => {
 };
 
 module.exports = {
-  getUser,
+  getUserByEmail,
   getUserById,
   createUser,
   deleteUser,

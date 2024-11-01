@@ -2,7 +2,10 @@ const userUseCase = require("../use_case/userUseCase");
 
 const createUser = async (req, res) => {
   try {
-    await userUseCase.createUser(req.body);
+    const userCriado = await userUseCase.createUser(req.body);
+    if (!userCriado) {
+      return res.status(404).json({ message: "E-mail já cadastrado no sistema" });
+    }
     return res.status(201).json({ message: "Usuário criado com sucesso" });
   } catch (error) {
     console.error(error);
@@ -10,10 +13,10 @@ const createUser = async (req, res) => {
   }
 };
 
-const getUser = async (req, res) => {
+const getUserByEmail = async (req, res) => {
   try {
     const { email } = req.params;
-    const usuario = await userUseCase.getUser(email);
+    const usuario = await userUseCase.getUserByEmail(email);
 
     if (!usuario) {
       return res.status(404).json({ message: "Usuário não encontrado" });
@@ -67,7 +70,7 @@ const updateUser = async (req, res) => {
     if (error.message === "Usuário não encontrado") {
       return res.status(404).json({ error: error.message });
     } 
-    else if (error.message === "E-mail já cadastrado") {
+    else if (error.message === "E-mail já cadastrado no sistema por outro usuário") {
       return res.status(404).json({ error: error.message });
     }
     console.error(error);
@@ -76,7 +79,7 @@ const updateUser = async (req, res) => {
 };
 
 module.exports = {
-  getUser,
+  getUserByEmail,
   getUserById,
   createUser,
   deleteUser,

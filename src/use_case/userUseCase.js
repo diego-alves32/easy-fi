@@ -2,15 +2,20 @@ const userModel = require("../models/userModel");
 
 const createUser = async (usuario) => {
   try {
+    const emailCadastrado = await getUserByEmail(usuario.email);
+    if (emailCadastrado) {
+      return false;
+    }
     await userModel.createUser(usuario);
+    return true;
   } catch (error) {
     throw new Error("Erro ao criar usuário");
   }
 };
 
-const getUser = async (email) => {
+const getUserByEmail = async (email) => {
   try {
-    const usuario = await userModel.getUser(email);
+    const usuario = await userModel.getUserByEmail(email);
     return usuario;
   } catch (error) {
     throw new Error("Erro ao buscar usuário");
@@ -52,9 +57,11 @@ const updateUser = async (id, userData) => {
       throw new Error("Usuário não encontrado");
     }
     
-    const emailCadastrado = await getUser(userData.email);
+    const emailCadastrado = await getUserByEmail(userData.email);
     if (emailCadastrado) {
-      throw new Error("E-mail já cadastrado");
+      if (emailCadastrado.id == id) {
+        throw new Error("E-mail já cadastrado no sistema por outro usuário");
+      }
     }
     
     const userAtualizado = await userModel.updateUser(id, userData);
@@ -65,7 +72,7 @@ const updateUser = async (id, userData) => {
 };
 
 module.exports = {
-  getUser,
+  getUserByEmail,
   getUserById,
   createUser,
   deleteUser,
