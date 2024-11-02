@@ -59,7 +59,7 @@ const updateUser = async (id, userData) => {
     
     const emailCadastrado = await getUserByEmail(userData.email);
     if (emailCadastrado) {
-      if (emailCadastrado.id == id) {
+      if (emailCadastrado.id != id) {
         throw new Error("E-mail já cadastrado no sistema por outro usuário");
       }
     }
@@ -71,10 +71,26 @@ const updateUser = async (id, userData) => {
   }
 };
 
+const login = async (loginData) => {
+  try {
+    const emailCadastrado = await getUserByEmail(loginData.email);
+    if (!emailCadastrado) {
+      return false;
+    }
+    if (loginData.senha == emailCadastrado.senha) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    throw new Error("Erro ao criar usuário");
+  }
+};
+
 module.exports = {
   getUserByEmail,
   getUserById,
   createUser,
   deleteUser,
-  updateUser
+  updateUser,
+  login
 };
