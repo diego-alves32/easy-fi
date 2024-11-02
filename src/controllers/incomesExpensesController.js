@@ -1,41 +1,22 @@
-const userUseCase = require("../use_case/userUseCase");
+const incomesExpensesUseCase = require("../use_case/incomesExpensesUseCase");
 
-const createUser = async (req, res) => {
+const createItem = async (req, res) => {
   try {
-    const userCriado = await userUseCase.createUser(req.body);
-    if (!userCriado) {
-      return res.status(404).json({ message: "E-mail já cadastrado no sistema" });
-    }
-    return res.status(201).json({ message: "Usuário criado com sucesso" });
+    await incomesExpensesUseCase.createItem(req.body);
+    return res.status(201).json({ message: "Registro criado com sucesso" });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: error.message });
   }
 };
 
-const getUserByEmail = async (req, res) => {
-  try {
-    const { email } = req.params;
-    const usuario = await userUseCase.getUserByEmail(email);
-
-    if (!usuario) {
-      return res.status(404).json({ message: "Usuário não encontrado" });
-    }
-
-    return res.status(200).json({ usuario });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: error.message });
-  }
-};
-
-const getUserById = async (req, res) => {
+const getItemById = async (req, res) => {
   try {
     const { id } = req.params;
-    const usuario = await userUseCase.getUserById(id);
+    const registro = await incomesExpensesUseCase.getItemById(id);
 
-    if (!usuario) {
-      return res.status(404).json({ message: "Usuário não encontrado" });
+    if (!registro) {
+      return res.status(404).json({ message: "Registro não encontrado" });
     }
 
     return res.status(200).json({ usuario });
@@ -45,57 +26,54 @@ const getUserById = async (req, res) => {
   }
 };
 
-
-const deleteUser = async (req, res) => {
+const getItensByCategoryAndDateRange = async (req, res) => {
   try {
-    await userUseCase.deleteUser(req.params.id);
-    return res.status(200).json({ message: "Usuário deletado com sucesso" });
-  } catch (error) {
-    if (error.message === "Usuário não encontrado") {
-      return res.status(404).json({ error: error.message });
-    }
-    console.error(error);
-    return res.status(500).json({ error: "Erro ao deletar usuário" });
-  }
-};
+    const { id } = req.params;
+    const registro = await incomesExpensesUseCase.getItensByCategoryAndDateRange(id, req.body);
 
-const updateUser = async (req, res) => {
-  const { id } = req.params;
-  const userData = req.body;
-
-  try {
-    await userUseCase.updateUser(id, userData);
-    return res.status(200).json({ message: "Usuário atualizado com sucesso" });
-  } catch (error) {
-    if (error.message === "Usuário não encontrado") {
-      return res.status(404).json({ error: error.message });
-    } 
-    else if (error.message === "E-mail já cadastrado no sistema por outro usuário") {
-      return res.status(404).json({ error: error.message });
+    if (!registro) {
+      return res.status(404).json({ message: "Registro não encontrado" });
     }
-    console.error(error);
-    return res.status(500).json({ error: "Erro ao atualizar usuário" });
-  }
-};
 
-const login = async (req, res) => {
-  try {
-    const loginAccess = await userUseCase.login(req.body);
-    if (!loginAccess) {
-      return res.status(404).json({ message: "E-mail ou senha digitados incorretamente" });
-    }
-    return res.status(200).json({ message: "Login efetuado com sucesso" });
+    return res.status(200).json({ registro });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: error.message });
+  }
+};
+
+const deleteItem = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await incomesExpensesUseCase.deleteItem(id);
+    return res.status(200).json({ message: "Registro deletado com sucesso" });
+  } catch (error) {
+    if (error.message === "Registro não encontrado") {
+      return res.status(404).json({ error: error.message });
+    }
+    console.error(error);
+    return res.status(500).json({ error: "Erro ao deletar registro" });
+  }
+};
+
+const updateItem = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await incomesExpensesUseCase.updateItem(id, req.body);
+    return res.status(200).json({ message: "Registro atualizado com sucesso" });
+  } catch (error) {
+    if (error.message === "Registro não encontrado") {
+      return res.status(404).json({ error: error.message });
+    } 
+    console.error(error);
+    return res.status(500).json({ error: "Erro ao atualizar registro" });
   }
 };
 
 module.exports = {
-  getUserByEmail,
-  getUserById,
-  createUser,
-  deleteUser,
-  updateUser,
-  login,
+  createItem,
+  getItemById,
+  getItensByCategoryAndDateRange,
+  updateItem,
+  deleteItem,
 };

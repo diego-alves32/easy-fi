@@ -1,96 +1,63 @@
-const userModel = require("../models/userModel");
+const incomesExpensesModel = require("../models/incomesExpensesModel");
 
-const createUser = async (usuario) => {
+const createItem = async (item) => {
   try {
-    const emailCadastrado = await getUserByEmail(usuario.email);
-    if (emailCadastrado) {
-      return false;
-    }
-    await userModel.createUser(usuario);
+    await incomesExpensesModel.createItem(item);
     return true;
   } catch (error) {
-    throw new Error("Erro ao criar usuário");
+    throw new Error("Erro ao criar registro de item");
   }
 };
 
-const getUserByEmail = async (email) => {
+const getItemById = async (id) => {
   try {
-    const usuario = await userModel.getUserByEmail(email);
-    return usuario;
-  } catch (error) {
-    throw new Error("Erro ao buscar usuário");
-  }
-};
-
-const getUserById = async (id) => {
-  try {
-    const usuario = await userModel.getUserById(id);
-    if (!usuario) {
+    const item = await incomesExpensesModel.getItemById(id);
+    if (!registro) {
       return false
     }
-    return usuario;
+    return item;
   } catch (error) {
-    throw new Error("Erro ao buscar usuário");
+    throw new Error("Erro ao buscar registro");
   }
 };
 
-const deleteUser = async (id) => {
+const getItensByCategoryAndDateRange = async (itemData) => {
   try {
-    const user = await getUserById(id);
-    if (!user) {
-      throw new Error("Usuário não encontrado");
-    }
-    
-    const userExists = await userModel.deleteUser(id);
-    if (!userExists) {
-      return false;
-    }
+    const { userId } = itemData.userId; 
+    const { categoryId } = itemData.userId; 
+    const { initDate } = itemData.initDate; 
+    const { finalDate } = itemData.finalDate; 
+    const item = await incomesExpensesModel.getItensByCategoryAndDateRange(userId, categoryId, initDate, finalDate);
+    return item;
+  } catch (error) {
+    throw new Error("Erro ao buscar registros");
+  }
+};
+
+const updateItem = async (id, itemData) => {
+  try {    
+    return await incomesExpensesModel.updateItem(id, itemData);;
   } catch (error) {
     throw error;
   }
 };
 
-const updateUser = async (id, userData) => {
+const deleteItem = async (id) => {
   try {
-    const user = await getUserById(id);
-    if (!user) {
-      throw new Error("Usuário não encontrado");
+    const item = await getItemById(id);
+    if (!item) {
+      throw new Error("Registro não encontrado");
     }
-    
-    const emailCadastrado = await getUserByEmail(userData.email);
-    if (emailCadastrado) {
-      if (emailCadastrado.id != id) {
-        throw new Error("E-mail já cadastrado no sistema por outro usuário");
-      }
-    }
-    
-    const userAtualizado = await userModel.updateUser(id, userData);
-    return userAtualizado;
+    await incomesExpensesModel.deleteItem(id);
   } catch (error) {
     throw error;
-  }
-};
-
-const login = async (loginData) => {
-  try {
-    const emailCadastrado = await getUserByEmail(loginData.email);
-    if (!emailCadastrado) {
-      return false;
-    }
-    if (loginData.senha == emailCadastrado.senha) {
-      return true;
-    }
-    return false;
-  } catch (error) {
-    throw new Error("Erro ao criar usuário");
   }
 };
 
 module.exports = {
-  getUserByEmail,
-  getUserById,
-  createUser,
-  deleteUser,
-  updateUser,
-  login
+  createItem,
+  getItemById,
+  getItensByCategoryAndDateRange,
+  updateItem,
+  deleteItem,
 };

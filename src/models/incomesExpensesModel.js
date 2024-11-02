@@ -1,72 +1,80 @@
 const db = require("../db/knex");
 
-const createUser = async (usuario) => {
+const createItem = async (item) => {
   try {
-    await db("usuarios").insert({
-      email: usuario.email,
-      nome: usuario.nome,
-      senha: usuario.senha,
+    await db("registros").insert({
+      id_usuario: item.idUsuario,
+      id_categoria: item.idCategoria,
+      desc_registro: item.descricaoItem,
+      data_fato: item.dataOcorrencia,
+      valor: item.valor,
     });
   } catch (error) {
-    console.error("Erro ao criar usuário no banco de dados:", error);
+    console.error("Erro ao criar registro no banco de dados:", error);
     throw error;
   }
 };
 
-const getUserByEmail = async (email) => {
+const getItemById = async (id) => {
   try {
-    const usuario = await db("usuarios")
+    const usuario = await db("registros")
       .select("*")
-      .where({ email: email })
+      .where({ id_registro: id })
       .first();
     return usuario;
   } catch (error) {
-    console.error("Erro ao buscar usuário no banco de dados:", error);
+    console.error("Erro ao buscar registro no banco de dados:", error);
     throw error;
   }
 };
 
-const getUserById = async (id) => {
+const getItensByCategoryAndDateRange = async (userId, categoryId = null, initDate, finalDate) => {
   try {
-    const usuario = await db("usuarios")
+    const query = db("registros")
       .select("*")
-      .where({ id_usuario: id })
-      .first();
-    return usuario;
+      .where({ id_user: userId })
+      .andWhere("date", ">=", initDate)
+      .andWhere("date", "<=", finalDate);
+
+    if (categoryId !== null) {
+      query.andWhere({ id_category: categoryId });
+    }
+
+    return await query;
   } catch (error) {
-    console.error("Erro ao buscar usuário no banco de dados:", error);
+    console.error("Erro ao buscar registros no banco de dados:", error);
     throw error;
   }
 };
 
-const deleteUser = async (id) => {
+const updateItem = async (id, itemData) => {
   try {
-    await db("usuarios")
-      .where({ id_usuario: id })
+    await db("registros")
+      .where({ id_registro: id })
+      .update(itemData);
+    return true; // Atualização bem-sucedida
+  } catch (error) {
+    console.error("Erro ao atualizar registro no banco de dados:", error);
+    throw error;
+  }
+};
+
+const deleteItem = async (id) => {
+  try {
+    await db("registros")
+      .where({ id_registro: id })
       .delete();
     return true; // Deleção bem-sucedida
   } catch (error) {
-    console.error("Erro ao deletar usuário no banco de dados:", error);
+    console.error("Erro ao deletar registro no banco de dados:", error);
     throw error;
   }
 };
-
-const updateUser = async (id, userData) => {
-  try {
-    await db("usuarios")
-      .where({ id_usuario: id })
-      .update(userData);
-    return true; // Atualização bem-sucedida
-  } catch (error) {
-    console.error("Erro ao atualizar usuário no banco de dados:", error);
-    throw error;
-  }
-};
-
+  
 module.exports = {
-  getUserByEmail,
-  getUserById,
-  createUser,
-  deleteUser,
-  updateUser,
+  createItem,
+  getItemById,
+  getItensByCategoryAndDateRange,
+  updateItem,
+  deleteItem,
 };

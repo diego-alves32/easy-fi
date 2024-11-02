@@ -1,11 +1,9 @@
 const express = require("express");
-const userController = require("../controllers/userController");
+const incomesExpensesController = require("../controllers/incomesExpensesController");
 const router = express.Router();
 
-router.post("/cadastro", userController.createItem);
-router.get("/buscarItem/:id", userController.getItemById);
-router.delete("/deletarItem/:id", userController.deleteItem);
-router.put("/atualizaItem/:id", userController.updateItem);
-router.get("/buscarItensMes/:id", userController.getItemById);
-
-module.exports = router;
+router.post("/cadastroItem", incomesExpensesController.createItem);
+router.get("/buscarItem/:id", incomesExpensesController.getItemById);
+router.get("/buscarExtratoFiltro/:categoria/:dataInicio-:dataFim", incomesExpensesController.getItensByCategoryAndDateRange);
+router.put("/atualizarItem/:id", incomesExpensesController.updateItem);
+router.delete("/deletarItem/:id", incomesExpensesController.deleteItem);
