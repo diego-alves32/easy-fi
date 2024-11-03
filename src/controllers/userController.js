@@ -4,7 +4,9 @@ const createUser = async (req, res) => {
   try {
     const userCriado = await userUseCase.createUser(req.body);
     if (!userCriado) {
-      return res.status(404).json({ message: "E-mail já cadastrado no sistema" });
+      return res
+        .status(404)
+        .json({ message: "E-mail já cadastrado no sistema" });
     }
     return res.status(201).json({ message: "Usuário criado com sucesso" });
   } catch (error) {
@@ -32,6 +34,7 @@ const getUserByEmail = async (req, res) => {
 const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log(id);
     const usuario = await userUseCase.getUserById(id);
 
     if (!usuario) {
@@ -44,7 +47,6 @@ const getUserById = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
-
 
 const deleteUser = async (req, res) => {
   try {
@@ -69,8 +71,9 @@ const updateUser = async (req, res) => {
   } catch (error) {
     if (error.message === "Usuário não encontrado") {
       return res.status(404).json({ error: error.message });
-    } 
-    else if (error.message === "E-mail já cadastrado no sistema por outro usuário") {
+    } else if (
+      error.message === "E-mail já cadastrado no sistema por outro usuário"
+    ) {
       return res.status(404).json({ error: error.message });
     }
     console.error(error);
@@ -82,7 +85,9 @@ const login = async (req, res) => {
   try {
     const loginAccess = await userUseCase.login(req.body);
     if (!loginAccess) {
-      return res.status(404).json({ message: "E-mail ou senha digitados incorretamente" });
+      return res
+        .status(404)
+        .json({ message: "E-mail ou senha digitados incorretamente" });
     }
     return res.status(200).json({ message: "Login efetuado com sucesso" });
   } catch (error) {
