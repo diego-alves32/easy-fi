@@ -11,5 +11,8 @@ app.use(express.json());
 app.use("/users", userRoutes);
 app.use("/incomes-expenses", incomesExpensesRoutes);
 app.use("/categories", categorias);
+app.use("/", (req, res) => {
+  return res.status(200).json({ msg: "Olá! Bem vindo a API Easy-fi" });
+});
 
 module.exports = app;
