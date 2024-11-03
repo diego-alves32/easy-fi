@@ -1,4 +1,5 @@
 const incomesExpensesModel = require("../models/incomesExpensesModel");
+const userModel = require("../models/userModel");
 
 const createItem = async (item) => {
   try {
@@ -12,7 +13,7 @@ const createItem = async (item) => {
 const getItemById = async (id) => {
   try {
     const item = await incomesExpensesModel.getItemById(id);
-    if (!registro) {
+    if (!item) {
       return false
     }
     return item;
@@ -21,22 +22,42 @@ const getItemById = async (id) => {
   }
 };
 
-const getItensByCategoryAndDateRange = async (itemData) => {
+const getCategoryById = async (id) => {
   try {
-    const { userId } = itemData.userId; 
-    const { categoryId } = itemData.userId; 
-    const { initDate } = itemData.initDate; 
-    const { finalDate } = itemData.finalDate; 
-    const item = await incomesExpensesModel.getItensByCategoryAndDateRange(userId, categoryId, initDate, finalDate);
-    return item;
+    const category = await incomesExpensesModel.getCategoryById(id);
+    if (!category) {
+      return false
+    }
+    return true;
+  } catch (error) {
+    throw new Error("Erro ao buscar categoria");
+  }
+};
+
+const getItensByCategoryAndDateRange = async (userId, descCategoria, dataInicio, dataFim) => {
+  try {
+    const extratoPeriodo = await incomesExpensesModel.getItensByCategoryAndDateRange(userId, descCategoria, dataInicio, dataFim);
+    return extratoPeriodo;
   } catch (error) {
     throw new Error("Erro ao buscar registros");
   }
 };
 
-const updateItem = async (id, itemData) => {
-  try {    
-    return await incomesExpensesModel.updateItem(id, itemData);;
+const updateItem = async (idRegistro, itemData) => {
+  try {
+    const usuarioCadastrado = await userModel.getUserById(itemData.idUsuario);
+    if (!usuarioCadastrado) {
+      throw new Error("Erro ao buscar usuário");
+    }
+    const itemCadastrado = await getItemById(idRegistro);
+    if (!itemCadastrado) {
+      throw new Error("Erro ao buscar item");
+    }
+    const categCadastrada = await getCategoryById(itemData.idCategoria);
+    if (!categCadastrada) {
+      throw new Error("Erro ao buscar categoria");
+    }
+    return await incomesExpensesModel.updateItem(idRegistro, itemData);;
   } catch (error) {
     throw error;
   }

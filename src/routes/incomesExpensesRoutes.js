@@ -5,7 +5,7 @@ const router = express.Router();
 router.post("/cadastroItem", incomesExpensesController.createItem);
 router.get("/buscarItem/:id", incomesExpensesController.getItemById);
 router.get(
-  "/buscarExtratoFiltro/:categoria/:dataInicio-:dataFim",
+  "/buscarExtratoFiltro",
   incomesExpensesController.getItensByCategoryAndDateRange
 );
 router.put("/atualizarItem/:id", incomesExpensesController.updateItem);
