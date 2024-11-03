@@ -9,6 +9,7 @@ const createItem = async (item) => {
       data_fato: item.dataOcorrencia,
       valor: item.valor,
     });
+    return true;
   } catch (error) {
     console.error("Erro ao criar registro no banco de dados:", error);
     throw error;
@@ -17,30 +18,44 @@ const createItem = async (item) => {
 
 const getItemById = async (id) => {
   try {
-    const usuario = await db("registros")
+    const item = await db("registros")
       .select("*")
       .where({ id_registro: id })
       .first();
-    return usuario;
+    return item;
   } catch (error) {
     console.error("Erro ao buscar registro no banco de dados:", error);
     throw error;
   }
 };
 
-const getItensByCategoryAndDateRange = async (userId, categoryId = null, initDate, finalDate) => {
+const getCategoryById = async (id) => {
+  try {
+    const categoria = await db("categorias")
+      .select("*")
+      .where({ id_categoria: id })
+      .first();
+    return categoria;
+  } catch (error) {
+    console.error("Erro ao buscar categoria no banco de dados:", error);
+    throw error;
+  }
+};
+
+const getItensByCategoryAndDateRange = async (userId, descCategoria, dataInicio, dataFim) => {
   try {
     const query = db("registros")
-      .select("*")
-      .where({ id_user: userId })
-      .andWhere("date", ">=", initDate)
-      .andWhere("date", "<=", finalDate);
-
-    if (categoryId !== null) {
-      query.andWhere({ id_category: categoryId });
-    }
-
-    return await query;
+    .select("registros.*")
+    .where("id_usuario", userId)
+    .join("categorias", "registros.id_categoria", "=", "categorias.id_categoria")
+    .andWhere("registros.data_fato", ">=", dataInicio)
+    .andWhere("registros.data_fato", "<=", dataFim);
+  
+  if (descCategoria !== "todas") {
+    query.andWhere("categorias.desc_categoria", descCategoria);
+  }
+  
+  return await query;
   } catch (error) {
     console.error("Erro ao buscar registros no banco de dados:", error);
     throw error;
@@ -51,7 +66,13 @@ const updateItem = async (id, itemData) => {
   try {
     await db("registros")
       .where({ id_registro: id })
-      .update(itemData);
+      .update({ 
+        id_usuario: itemData.idUsuario,
+        id_categoria: itemData.idCategoria,
+        desc_registro: itemData.descricaoItem,
+        data_fato: itemData.dataOcorrencia,
+        valor: itemData.valor
+      });
     return true; // Atualização bem-sucedida
   } catch (error) {
     console.error("Erro ao atualizar registro no banco de dados:", error);
@@ -74,6 +95,7 @@ const deleteItem = async (id) => {
 module.exports = {
   createItem,
   getItemById,
+  getCategoryById,
   getItensByCategoryAndDateRange,
   updateItem,
   deleteItem,

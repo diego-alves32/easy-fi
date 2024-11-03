@@ -19,7 +19,7 @@ const getItemById = async (req, res) => {
       return res.status(404).json({ message: "Registro não encontrado" });
     }
 
-    return res.status(200).json({ usuario });
+    return res.status(200).json({ registro });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: error.message });
@@ -28,14 +28,14 @@ const getItemById = async (req, res) => {
 
 const getItensByCategoryAndDateRange = async (req, res) => {
   try {
-    const { id } = req.params;
-    const registro = await incomesExpensesUseCase.getItensByCategoryAndDateRange(id, req.body);
+    const { userId, descCategoria = "todas", dataInicio, dataFim } = req.query
+    const extrato = await incomesExpensesUseCase.getItensByCategoryAndDateRange(userId, descCategoria, dataInicio, dataFim);
 
-    if (!registro) {
-      return res.status(404).json({ message: "Registro não encontrado" });
+    if (!extrato) {
+      return res.status(404).json({ message: "Extrato não encontrado" });
     }
 
-    return res.status(200).json({ registro });
+    return res.status(200).json({ extrato });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: error.message });
@@ -62,7 +62,11 @@ const updateItem = async (req, res) => {
     await incomesExpensesUseCase.updateItem(id, req.body);
     return res.status(200).json({ message: "Registro atualizado com sucesso" });
   } catch (error) {
-    if (error.message === "Registro não encontrado") {
+    if (error.message === "Erro ao buscar usuário") {
+      return res.status(404).json({ error: error.message });
+    } else if (error.message === "Erro ao buscar item") {
+      return res.status(404).json({ error: error.message });
+    } else if (error.message === "Erro ao buscar categoria") {
       return res.status(404).json({ error: error.message });
     } 
     console.error(error);
