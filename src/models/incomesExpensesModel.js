@@ -42,20 +42,30 @@ const getCategoryById = async (id) => {
   }
 };
 
-const getItensByCategoryAndDateRange = async (userId, descCategoria, dataInicio, dataFim) => {
+const getItensByCategoryAndDateRange = async (
+  userId,
+  descCategoria,
+  dataInicio,
+  dataFim
+) => {
   try {
     const query = db("registros")
-    .select("registros.*")
-    .where("id_usuario", userId)
-    .join("categorias", "registros.id_categoria", "=", "categorias.id_categoria")
-    .andWhere("registros.data_fato", ">=", dataInicio)
-    .andWhere("registros.data_fato", "<=", dataFim);
-  
-  if (descCategoria !== "todas") {
-    query.andWhere("categorias.desc_categoria", descCategoria);
-  }
-  
-  return await query;
+      .select("registros.*", "categorias.tipo")
+      .where("id_usuario", userId)
+      .join(
+        "categorias",
+        "registros.id_categoria",
+        "=",
+        "categorias.id_categoria"
+      )
+      .andWhere("registros.data_fato", ">=", dataInicio)
+      .andWhere("registros.data_fato", "<=", dataFim);
+
+    if (descCategoria !== "todas") {
+      query.andWhere("categorias.desc_categoria", descCategoria);
+    }
+
+    return await query;
   } catch (error) {
     console.error("Erro ao buscar registros no banco de dados:", error);
     throw error;
@@ -64,15 +74,13 @@ const getItensByCategoryAndDateRange = async (userId, descCategoria, dataInicio,
 
 const updateItem = async (id, itemData) => {
   try {
-    await db("registros")
-      .where({ id_registro: id })
-      .update({ 
-        id_usuario: itemData.idUsuario,
-        id_categoria: itemData.idCategoria,
-        desc_registro: itemData.descricaoItem,
-        data_fato: itemData.dataOcorrencia,
-        valor: itemData.valor
-      });
+    await db("registros").where({ id_registro: id }).update({
+      id_usuario: itemData.idUsuario,
+      id_categoria: itemData.idCategoria,
+      desc_registro: itemData.descricaoItem,
+      data_fato: itemData.dataOcorrencia,
+      valor: itemData.valor,
+    });
     return true; // Atualização bem-sucedida
   } catch (error) {
     console.error("Erro ao atualizar registro no banco de dados:", error);
@@ -82,16 +90,14 @@ const updateItem = async (id, itemData) => {
 
 const deleteItem = async (id) => {
   try {
-    await db("registros")
-      .where({ id_registro: id })
-      .delete();
-    return true; // Deleção bem-sucedida
+    await db("registros").where({ id_registro: id }).delete();
+    return true;
   } catch (error) {
     console.error("Erro ao deletar registro no banco de dados:", error);
     throw error;
   }
 };
-  
+
 module.exports = {
   createItem,
   getItemById,

@@ -1,11 +1,13 @@
 const express = require("express");
 const dotenv = require("dotenv").config();
+const cors = require("cors");
 const userRoutes = require("./routes/userRoutes.js");
 const incomesExpensesRoutes = require("./routes/incomesExpensesRoutes.js");
 const categorias = require("./routes/categoriesRoutes.js");
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 app.use("/users", userRoutes);
