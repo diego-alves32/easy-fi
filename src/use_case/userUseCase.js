@@ -26,7 +26,7 @@ const getUserById = async (id) => {
   try {
     const usuario = await userModel.getUserById(id);
     if (!usuario) {
-      return false
+      return false;
     }
     return usuario;
   } catch (error) {
@@ -40,7 +40,7 @@ const deleteUser = async (id) => {
     if (!user) {
       throw new Error("Usuário não encontrado");
     }
-    
+
     const userExists = await userModel.deleteUser(id);
     if (!userExists) {
       return false;
@@ -56,14 +56,14 @@ const updateUser = async (id, userData) => {
     if (!user) {
       throw new Error("Usuário não encontrado");
     }
-    
+
     const emailCadastrado = await getUserByEmail(userData.email);
     if (emailCadastrado) {
       if (emailCadastrado.id != id) {
         throw new Error("E-mail já cadastrado no sistema por outro usuário");
       }
     }
-    
+
     const userAtualizado = await userModel.updateUser(id, userData);
     return userAtualizado;
   } catch (error) {
@@ -78,7 +78,7 @@ const login = async (loginData) => {
       return false;
     }
     if (loginData.senha == emailCadastrado.senha) {
-      return true;
+      return { success: true, usuario: emailCadastrado };
     }
     return false;
   } catch (error) {
@@ -92,5 +92,5 @@ module.exports = {
   createUser,
   deleteUser,
   updateUser,
-  login
+  login,
 };
