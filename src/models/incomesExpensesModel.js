@@ -50,7 +50,7 @@ const getItensByCategoryAndDateRange = async (
 ) => {
   try {
     const query = db("registros")
-      .select("registros.*", "categorias.tipo")
+      .select("registros.*", "categorias.tipo", "categorias.desc_categoria")
       .where("id_usuario", userId)
       .join(
         "categorias",
