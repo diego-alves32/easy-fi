@@ -97,7 +97,7 @@ const deleteItem = async (id) => {
     throw error;
   }
 };
-
+/* Ex */
 module.exports = {
   createItem,
   getItemById,
